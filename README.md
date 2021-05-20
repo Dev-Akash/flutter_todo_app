@@ -1,4 +1,4 @@
-# Flutter Todo App
+# Flutter Todo App ("Todo Rage")
 
 A new Flutter application for jotting down the task with minimal UI interaction named as "Todo Rage".
 
