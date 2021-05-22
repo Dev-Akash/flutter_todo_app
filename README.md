@@ -1,10 +1,10 @@
-# party_planner
+# Flutter Todo App ("Todo Rage")
 
-A new Flutter application.
+A new Flutter application for jotting down the task with minimal UI interaction named as "Todo Rage".
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a starting point for application.
 
 A few resources to get you started if this is your first Flutter project:
 
