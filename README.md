@@ -2,6 +2,8 @@
 
 A new Flutter application for jotting down the task with minimal UI interaction named as "Todo Rage".
 
+![showcase.png](/PreviewImages/Showcase.png)
+
 ## Getting Started
 
 This project is a starting point for application.
