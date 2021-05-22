@@ -1,3 +1,8 @@
+// @dart=2.9
+
+import 'Todo.dart';
+import 'TodoList.dart';
+import 'SharedPref.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
@@ -12,9 +17,38 @@ class _MyAppState extends State<MyApp> {
   List<Todos> _todos = <Todos>[];
   TextEditingController _titleController = new TextEditingController(text: "");
   TextEditingController _descController = new TextEditingController(text: "");
+  var counter = 0;
 
   @override
   Widget build(BuildContext context) {
+    loadSharedPrefs() async{
+      try{
+        if(counter != 1){
+          String data = await SharedPref().read("cards");
+          print("Data == "+ data);
+          TodoList list = new TodoList(_todos);
+          List<Todos> ba = list.toList(data);
+          _todos.clear();
+          _todos.addAll(ba);
+          print(_todos);
+          setState(() {
+            counter = 1;
+          });
+        }
+      }
+      catch(Exception){
+        print(Exception);
+      }
+    }
+
+    loadSharedPrefs();
+
+    saveSharedPrefs() async{
+      String value = TodoList(_todos).toString();
+      print("New String Value == " +value);
+      await SharedPref().remove("cards");
+      await SharedPref().save("cards", value);
+    }
     return MaterialApp(
       title: "Todo App",
       debugShowCheckedModeBanner: false,
@@ -22,7 +56,9 @@ class _MyAppState extends State<MyApp> {
         floatingActionButton: new FloatingActionButton(
           onPressed: () {
             setState(() {
-              _todos.add(Todos("", ""));
+              _todos.add(Todos("", "", false));
+              // print(_todos);
+              saveSharedPrefs();
             });
             // print(_todos.toString());
           },
@@ -61,13 +97,36 @@ class _MyAppState extends State<MyApp> {
                         margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
                         padding: EdgeInsets.all(20.0),
                         decoration: new BoxDecoration(
-                          color: Color(0xFFFFFFFF),
+                          color: (_todos.elementAt(index).isPinned) ? Color(0xFFFF6347): Color(0xFFFFFFFF),
                           borderRadius: new BorderRadius.circular(20.0),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+
+                            Container(
+                              child: GestureDetector(
+                                onTap: (){
+                                  setState(() {
+                                    if(_todos.elementAt(index).isPinned){
+                                      _todos.elementAt(index).isPinned = false;
+                                      saveSharedPrefs();
+                                    }
+                                    else{
+                                      _todos.elementAt(index).isPinned = true;
+                                      saveSharedPrefs();
+                                    }
+                                  });
+                                },
+                                child: (_todos.elementAt(index).isPinned)
+                                    ? Icon(Icons.push_pin_rounded)
+                                    : Icon(Icons.push_pin_outlined),
+                              ),
+                              alignment: Alignment.topRight,
+                              margin: EdgeInsets.fromLTRB(0,0, 0, 10),
+                            ),
+
                             (_todos.elementAt(index).getTitle() != "")
                                 ? Text(
                                     _todos.elementAt(index).getTitle(),
@@ -85,6 +144,7 @@ class _MyAppState extends State<MyApp> {
                                       setState(() {
                                         _titleController.text = "";
                                         _todos.elementAt(index).title = value;
+                                        saveSharedPrefs();
                                       });
                                     },
                                     controller: _titleController,
@@ -106,6 +166,7 @@ class _MyAppState extends State<MyApp> {
                                         setState(() {
                                           _descController.text = "";
                                           _todos.elementAt(index).desc = value;
+                                          saveSharedPrefs();
                                         });
                                       },
                                       controller: _descController,
@@ -134,6 +195,7 @@ class _MyAppState extends State<MyApp> {
                                           onTap: () {
                                             setState(() {
                                               _todos.removeAt(index);
+                                              saveSharedPrefs();
                                             });
                                           },
                                           child: Icon(Icons.delete),
@@ -158,32 +220,5 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-}
 
-class Todos {
-  String title;
-  String desc;
-
-  Todos(this.title, this.desc);
-
-  getTitle() {
-    return this.title;
-  }
-
-  getDesc() {
-    return this.desc;
-  }
-
-  setTitle(String title){
-    this.title = title;
-  }
-
-  setDesc(String desc){
-    this.desc = desc;
-  }
-
-  @override
-  String toString() {
-    return "[" + title + "," + desc + "]";
-  }
 }
