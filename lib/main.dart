@@ -1,5 +1,7 @@
 // @dart=3.3
 
+import 'dart:developer';
+
 import 'Todo.dart';
 import 'TodoList.dart';
 import 'SharedPref.dart';
@@ -147,6 +149,13 @@ class _MyAppState extends State<MyApp> {
                                         saveSharedPrefs();
                                       });
                                     },
+                                    onTapOutside: (val){
+                                      setState(() {
+                                        _todos.elementAt(index).title = _titleController.text;
+                                        _titleController.text = "";
+                                        saveSharedPrefs();
+                                      });
+                                    },
                                     controller: _titleController,
                                   ),
                             (_todos.elementAt(index).getDesc() != "")
@@ -166,6 +175,13 @@ class _MyAppState extends State<MyApp> {
                                         setState(() {
                                           _descController.text = "";
                                           _todos.elementAt(index).desc = value;
+                                          saveSharedPrefs();
+                                        });
+                                      },
+                                      onTapOutside: (val) {
+                                        setState(() {
+                                          _todos.elementAt(index).desc = _descController.text;
+                                          _descController.text = "";
                                           saveSharedPrefs();
                                         });
                                       },
