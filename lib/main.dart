@@ -108,15 +108,28 @@ class _MyAppState extends State<MyApp> {
                           children: [
 
                             Container(
+                              alignment: Alignment.topRight,
+                              margin: EdgeInsets.fromLTRB(0,0, 0, 10),
                               child: GestureDetector(
                                 onTap: (){
                                   setState(() {
                                     if(_todos.elementAt(index).isPinned){
+                                      var res = _todos.lastIndexWhere((e) => e.isPinned != false);
                                       _todos.elementAt(index).isPinned = false;
+                                      print(res);
+                                      if(res != -1){
+                                        Todos t = _todos.elementAt(index);
+                                        _todos.removeAt(index);
+                                        _todos.insert(res, t);
+                                      }
                                       saveSharedPrefs();
                                     }
                                     else{
                                       _todos.elementAt(index).isPinned = true;
+                                      List<Todos> a = _todos;
+                                      a.insert(0, _todos.elementAt(index));
+                                      a.removeAt(index+1);
+                                      _todos = a;
                                       saveSharedPrefs();
                                     }
                                   });
@@ -125,21 +138,21 @@ class _MyAppState extends State<MyApp> {
                                     ? Icon(Icons.push_pin_rounded)
                                     : Icon(Icons.push_pin_outlined),
                               ),
-                              alignment: Alignment.topRight,
-                              margin: EdgeInsets.fromLTRB(0,0, 0, 10),
                             ),
 
                             (_todos.elementAt(index).getTitle() != "")
                                 ? Text(
                                     _todos.elementAt(index).getTitle(),
                                     textAlign: TextAlign.start,
-                                    style: new TextStyle(
+                                    style: TextStyle(
+                                      color: _todos.elementAt(index).isPinned ? Colors.white : Colors.black,
                                       fontSize: 23,
                                       fontWeight: FontWeight.bold,
+
                                     ),
                                   )
                                 : TextField(
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                         border: OutlineInputBorder(),
                                         hintText: "Task Title",),
                                     onSubmitted: (value) {
@@ -161,8 +174,11 @@ class _MyAppState extends State<MyApp> {
                             (_todos.elementAt(index).getDesc() != "")
                                 ? Text(
                                     _todos.elementAt(index).getDesc(),
-                                    style: new TextStyle(
-                                        fontSize: 18, height: 1.5),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      height: 1.5,
+                                      color: _todos.elementAt(index).isPinned ? Colors.white: Colors.black
+                                    ),
                                   )
                                 : Container(
                                     margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
